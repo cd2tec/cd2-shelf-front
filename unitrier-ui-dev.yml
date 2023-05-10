@@ -1,0 +1,20 @@
+apps:
+   - name: "Unitrier UI"
+     deploy_name: "unitrier-ui"
+     group: "unitrier-dev"
+     image: "git-dreg.nexxera.com/tempocerto/unitrier-ui:master"
+     cpu:
+        min: "10"
+        max: "200"
+     memory:
+        min: "10"
+        max: "128"
+     routes:
+      - name: unitrier-ui-dev-route
+        hostname: unitrier-dev
+        port: 8080
+        path: ""
+        certificate: ""
+     env_vars:
+      - URL_APP_API_ENDPOINT='https://unitrier-dev.cloudint.nexxera.com/api'
+      - UNITRIER_SERVICE_BACKEND='unitrier.unitrier-dev.svc:8080'

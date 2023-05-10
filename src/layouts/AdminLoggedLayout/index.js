@@ -1,0 +1,74 @@
+import React, { useState, useContext, useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core';
+import NavBar from './NavBar';
+import TopBar from './TopBar';
+import LoggedContext from '../../context/LoggedContext';
+import { themeConfig } from '../../theme';
+
+const useStyles = makeStyles((theme) => ({
+	root: {
+		backgroundColor: '#f4f6f8',
+	},
+	wrapper: {
+		display: 'flex',
+		flex: '1 1 auto',
+		paddingTop: 64,
+		[theme.breakpoints.up('lg')]: {
+			paddingLeft: themeConfig.drawerWidth,
+		}
+	},
+	contentContainer: {
+		display: 'flex',
+		flex: '1 1 auto'
+	},
+	content: {
+		flex: '1 1 auto',
+		height: '100%'
+	}
+}));
+
+function AdminLoggedLayout() {
+	const loggedUser = useContext(LoggedContext);
+	const classes = useStyles();
+	const [isMobileNavOpen, setMobileNavOpen] = useState(false);
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		const routes = {
+			"empresas": "empresas",
+			"usuários": "usuarios",
+			"permissões": "permissoes",
+			"integradores": "integradores"
+		}
+		
+		//remove referências ao array e objetos do loggeduser
+		let perm = JSON.parse(JSON.stringify(loggedUser.permissoes))
+		perm = perm.map(p => p.permissao.split(' '))
+		perm = perm.map(p => p[p.length - 1])
+		navigate(`/admin/${routes[perm[0]]}`, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [navigate])
+
+	if (!loggedUser.usuario) return null;
+
+	return (
+		<div className={classes.root}>
+			<NavBar
+				onMobileClose={() => setMobileNavOpen(false)}
+				openMobile={isMobileNavOpen} />
+
+			<TopBar onMobileNavOpen={() => setMobileNavOpen(true)} />
+
+			<div className={classes.wrapper}>
+				<div className={classes.contentContainer}>
+					<div className={classes.content}>
+						<Outlet />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+export default AdminLoggedLayout;
